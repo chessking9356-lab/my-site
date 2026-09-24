@@ -1,0 +1,32 @@
+{
+  "focus_terms": ["machine compliance", "system compliance", "loading rate", "rate-dependent", "debonding", "crack stability", "inverse", "ice adhesion"],
+  "groups": {
+    "A": {
+      "queries": ["machine learning fracture mechanics", "physics informed inverse constitutive mechanics"],
+      "required": [["machine learning", "neural", "physics-informed", "deep learning", "active learning", "surrogate", "inverse"], ["mechanical", "mechanics", "fracture", "constitutive", "elasticity", "stress", "strain", "finite element"]],
+      "title_anchors": ["fracture", "constitutive", "mechanical properties", "solid mechanics", "elasticity", "finite element", "damage", "stress-strain", "plasticity", "mechanical behavior", "mechanical behaviour"],
+      "exclude_title": ["fuel", "ships", "memristor", "neuromorphic", "clinical", "traffic", "battery", "catalysis", "electrocatalytic"],
+      "terms": ["machine learning", "physics-informed", "neural", "inverse", "constitutive", "fracture", "finite element", "surrogate", "mechanics", "uncertainty"],
+      "focus": "力学参数反演与物理约束建模",
+      "question": "是否有独立观测约束参数，以及跨尺寸或加载条件验证？"
+    },
+    "B": {
+      "queries": ["bioinspired nacre composite fracture toughness", "bioinspired transparent glass impact interface"],
+      "required": [["bioinspired", "bio-inspired", "biomimetic", "nacre", "brick-and-mortar"], ["composite", "composites", "glass", "fracture", "toughness", "mechanical", "impact", "interface", "material", "materials"]],
+      "title_anchors": ["toughness", "fracture", "impact", "nacre", "glass", "mechanical", "interlocking", "brick-and-mortar", "tough", "toughening"],
+      "exclude_title": ["pesticidal", "pesticide", "agrochemical", "drug delivery", "catalysis", "electrocatalytic", "antibacterial"],
+      "terms": ["bioinspired", "bio-inspired", "nacre", "glass", "transparent", "interface", "toughness", "fracture", "impact", "interlocking", "rate-dependent"],
+      "focus": "仿生界面增韧与透明材料抗冲击",
+      "question": "界面结构、软相速率效应和光学性能能否分别验证？"
+    },
+    "C": {
+      "queries": ["ice adhesion loading rate interfacial fracture", "icephobic deicing interface mechanics compliance"],
+      "required": [["ice", "icephobic", "deicing", "de-icing", "anti-icing", "icing"], ["adhesion", "interfacial", "interface", "detachment", "fracture", "debonding", "deicing", "icephobic"]],
+      "title_anchors": ["ice adhesion", "icephobic", "deicing", "de-icing", "ice detachment", "ice shedding", "interfacial fracture", "ice removal"],
+      "exclude_title": ["ice nucleation", "sea ice", "sea-ice", "permafrost"],
+      "terms": ["ice", "adhesion", "icephobic", "interfacial", "fracture", "loading rate", "rate-dependent", "compliance", "debonding", "detachment", "stability"],
+      "focus": "加载历史、系统柔度与脱粘稳定性",
+      "question": "文中的速率是电机速度、应力加载率还是界面速度？"
+    }
+  }
+}
