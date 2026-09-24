@@ -1,0 +1,60 @@
+name: CK Research Daily
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'test sends a test card and activates daily delivery; dry-run sends nothing'
+        type: choice
+        options: [test, dry-run, daily]
+        default: test
+  push:
+    branches: [main]
+    paths: ['research_daily/**', '.github/workflows/ck-research-daily.yml']
+  schedule:
+    # 07:17 Asia/Shanghai; prepare early, then wait until 08:00.
+    - cron: '17 23 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: ck-research-daily
+  cancel-in-progress: false
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline tests
+        run: python -m unittest discover -s tests -p 'test_ck_daily.py' -v
+      - name: Generate and deliver
+        env:
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+          FEISHU_SECRET: ${{ secrets.FEISHU_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          RESEARCH_CONTEXT: ${{ secrets.RESEARCH_CONTEXT }}
+          GH_STATE_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MODE: ${{ inputs.mode }}
+        shell: bash
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            python research_daily/daily.py --mode daily --at-eight
+          elif [ "$EVENT_NAME" = "push" ]; then
+            python research_daily/daily.py --mode test
+          else
+            python research_daily/daily.py --mode "${INPUT_MODE:-test}"
+          fi
+      - name: Save daily archive for Hub import
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ck-daily-${{ github.run_id }}
+          path: work/ck-daily-output/
+          retention-days: 90
+          if-no-files-found: ignore
