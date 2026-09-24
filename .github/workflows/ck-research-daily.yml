@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'test sends a test card and activates daily delivery; dry-run sends nothing'
+        description: 'revision-1000 queues the one-off formal edition until 10:00 Shanghai on 2026-09-25'
         type: choice
-        options: [test, dry-run, daily]
+        options: [revision-1000, preview-revision, test, dry-run, daily]
         default: test
   push:
     branches: [main]
@@ -13,6 +13,7 @@ on:
   schedule:
     # 07:17 Asia/Shanghai; prepare early, then wait until 08:00.
     - cron: '17 23 * * *'
+    - cron: '17 1 25 9 *'
 permissions:
   contents: write
 concurrency:
@@ -21,7 +22,7 @@ concurrency:
 jobs:
   daily:
     runs-on: ubuntu-latest
-    timeout-minutes: 85
+    timeout-minutes: 180
     env:
       PYTHONIOENCODING: utf-8
     steps:
@@ -41,12 +42,27 @@ jobs:
           GH_STATE_TOKEN: ${{ github.token }}
           EVENT_NAME: ${{ github.event_name }}
           INPUT_MODE: ${{ inputs.mode }}
+          SCHEDULE: ${{ github.event.schedule }}
         shell: bash
         run: |
-          if [ "$EVENT_NAME" = "schedule" ]; then
+          if [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "17 1 25 9 *" ]; then
+            if [ "$(TZ=Asia/Shanghai date +%F)" != "2026-09-25" ]; then
+              echo 'One-off revision date has passed; no message sent.'
+              exit 0
+            fi
+            python research_daily/revision_1000.py --send
+          elif [ "$EVENT_NAME" = "schedule" ]; then
             python research_daily/daily.py --mode daily --at-eight
           elif [ "$EVENT_NAME" = "push" ]; then
-            python research_daily/daily.py --mode test
+            if [ -f research_daily/revision_1000.py ]; then
+              python research_daily/revision_1000.py
+            else
+              echo 'Waiting for revision_1000.py upload; nothing sent.'
+            fi
+          elif [ "$INPUT_MODE" = "revision-1000" ]; then
+            python research_daily/revision_1000.py --send
+          elif [ "$INPUT_MODE" = "preview-revision" ]; then
+            python research_daily/revision_1000.py
           else
             python research_daily/daily.py --mode "${INPUT_MODE:-test}"
           fi
